@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SocialExpertGrowth — Instant Social Media Services</title>
+  <meta name="description" content="Buy Instagram, Facebook, YouTube, TikTok followers, likes, views, and comments with geo‑based pricing and instant support." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1220;--card:#0f1a2f;--muted:#96a0b5;--text:#ecf1ff;--brand:#3b82f6;--brand-2:#22d3ee;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--white:#fff;
+      --radius:18px;--shadow:0 10px 30px rgba(23,40,85,.3);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:radial-gradient(1200px 800px at 80% -10%, rgba(34,211,238,.12), transparent 60%),radial-gradient(900px 600px at 10% -10%, rgba(59,130,246,.15), transparent 50%),var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1200px;margin:0 auto;padding:24px}
+    header{position:sticky;top:0;backdrop-filter:saturate(160%) blur(10px);background:rgba(11,18,32,.7);border-bottom:1px solid rgba(255,255,255,.06);z-index:50}
+    .nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
+    .badge{padding:2px 8px;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--brand-2));font-size:11px;font-weight:700}
+    .links a{margin:0 10px;opacity:.9}
+    .links a:hover{opacity:1}
+    .cta{padding:10px 16px;border-radius:999px;background:linear-gradient(90deg,var(--brand),var(--brand-2));color:var(--white);font-weight:700;box-shadow:var(--shadow)}
+
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;padding:36px 0}
+    .hero h1{font-size:42px;line-height:1.1;margin:0 0 12px}
+    .hero p{color:var(--muted);margin:0 0 18px}
+    .hero .actions{display:flex;gap:12px;flex-wrap:wrap}
+    .panel{padding:16px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+    .currency{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;font-weight:600}
+    .chip.active{background:linear-gradient(90deg,var(--brand),var(--brand-2));color:var(--white)}
+
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:28px 0 60px}
+    @media(max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
+    .card .head{display:flex;align-items:center;gap:10px;font-weight:800}
+    .card .head img{width:28px;height:28px}
+
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:13px;color:#cfd7f3}
+    select,input,button,textarea{background:#0b1426;color:var(--text);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 12px;font:inherit}
+    select,input:focus,textarea:focus{outline:2px solid rgba(59,130,246,.5)}
+    .price-line{font-size:13px;color:var(--muted)}
+    .buy{margin-top:auto}
+    .btn{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:linear-gradient(90deg,var(--brand),var(--brand-2));font-weight:800;color:#fff;cursor:pointer}
+
+    .price-table{display:grid;grid-template-columns:1fr auto;gap:6px;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+
+    /* Modal */
+    .overlay{position:fixed;inset:0;background:rgba(6,10,20,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+    .modal{width:min(720px,100%);background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:20px;box-shadow:var(--shadow);padding:20px;display:grid;gap:12px}
+    .modal h3{margin:0 0 4px}
+    .row{display:grid;grid-template-columns:.6fr .4fr;gap:14px}
+    @media(max-width:720px){.row{grid-template-columns:1fr}}
+    .muted{color:var(--muted);font-size:13px}
+    .payment-box{padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:grid;gap:8px}
+    .copy{cursor:pointer;padding:6px 10px;border:1px dashed rgba(255,255,255,.2);border-radius:10px;display:inline-flex;gap:8px;align-items:center}
+    .modal .actions{display:flex;gap:10px;justify-content:flex-end}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,.15)}
+
+    footer{border-top:1px solid rgba(255,255,255,.08);margin-top:40px}
+    .footer-wrap{display:grid;grid-template-columns:1fr auto;gap:12px;padding:24px 0;align-items:center}
+    .foot-links a{margin-right:10px;color:var(--muted)}
+
+    /* Floating WhatsApp */
+    .whatsapp{position:fixed;right:20px;bottom:20%;transform:translateY(75%);z-index:90}
+    .whatsapp a{display:inline-flex;align-items:center;gap:8px;padding:12px 14px;border-radius:999px;background:#25d366;color:#052e16;font-weight:800;box-shadow:0 8px 24px rgba(37,211,102,.35)}
+
+    .hidden{display:none}
+  </style>
+
+  <!-- Meta Pixel Code (replace PIXEL_ID) -->
+  <script>
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'PIXEL_ID'); // TODO: replace PIXEL_ID
+    fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=PIXEL_ID&ev=PageView&noscript=1"/></noscript>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="logo">⚡ SocialExpertGrowth <span class="badge">Trusted</span></div>
+      <nav class="links">
+        <a href="#home">Home</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a class="cta" href="#services">Order Now</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="home" class="hero">
+      <div>
+        <h1>Grow Your Social Media Instantly 🚀</h1>
+        <p>Instagram, Facebook, YouTube, TikTok — Followers, Likes, Views & Comments. Smart geo‑based pricing, currency switcher, and instant WhatsApp support.</p>
+        <div class="actions">
+          <a class="cta" href="#services">Start an Order</a>
+          <span class="muted">Secure • Fast • 24/7 Support</span>
+        </div>
+      </div>
+      <div class="panel">
+        <strong>Currency</strong>
+        <div id="currencySwitcher" class="currency"></div>
+        <div class="price-line">Region detected: <span id="regionText">Detecting…</span></div>
+        <div class="price-line">Active price list: <strong id="priceListName">—</strong></div>
+      </div>
+    </section>
+
+    <section id="services">
+      <h2 class="muted" style="margin:0 0 10px">Choose a platform</h2>
+      <div class="grid" id="cardsGrid"></div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h3>Order Summary</h3>
+      <div class="row">
+        <div>
+          <div class="field"><label>Platform</label><input id="mPlatform" readonly></div>
+          <div class="field"><label>Service</label><input id="mService" readonly></div>
+          <div class="field"><label>Quantity</label><input id="mQty" readonly></div>
+          <div class="field"><label>Profile/Post URL</label><input id="mLink" readonly></div>
+          <div class="field"><label>Total</label><input id="mTotal" readonly></div>
+        </div>
+        <div>
+          <div class="field"><label>Payment Method</label>
+            <div id="paymentBox" class="payment-box"></div>
+          </div>
+          <div class="field"><label>Upload Payment Screenshot</label><input id="mShot" type="file" accept="image/*"></div>
+          <div class="field"><label>Additional Comments (Optional)</label><textarea id="mNotes" rows="3" placeholder="Any special instructions or comments..."></textarea></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" id="cancelBtn">Cancel</button>
+        <button class="btn" id="submitBtn">Submit Order</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="contact">
+    <div class="container footer-wrap">
+      <div class="foot-links">
+        <a href="#home">Home</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+        <a href="#" onclick="alert('Privacy Policy: We only store details required to process your order.');return false;">Privacy Policy</a>
+      </div>
+      <div>
+        <span class="muted">Email:</span>
+        <span id="emailText">imrangee73@hotmail.co.uk</span>
+        <button class="copy" onclick="copyText('emailText')" title="Copy Email">📋 Copy</button>
+      </div>
+    </div>
+    <div class="container" style="padding-bottom:28px;color:var(--muted)">© 2025 SocialExpertGrowth. All rights reserved.</div>
+  </footer>
+
+  <!-- Floating WhatsApp Support -->
+  <div class="whatsapp">
+    <a id="supportWhatsApp" target="_blank" rel="noopener">💬 WhatsApp Support</a>
+  </div>
+
+<script>
+// --------- Configuration (edit these to your real data) ---------
+const SUPPORT_WA_NUMBER = '923266438812'; // WhatsApp in international format without +
+const SUPPORT_WA_TEXT = encodeURIComponent('Hello, I need help with my order on SocialExpertGrowth.');
+
+// Price lists by region (base currency = USD for simplicity). Adjust freely.
+// Each platform > service has a per-1000 price in USD.
+const PRICE_LISTS = {
+  USA: {
+    name: 'USA',
+    perK: {
+      Instagram: { Followers: 10, Likes: 8, Views: 4, Comments: 20 },
+      Facebook:  { Followers: 9,  Likes: 6, Views: 4, Comments: 18 },
+      YouTube:   { Subscribers: 14, Likes: 7, Views: 5, Comments: 22 },
+      TikTok:    { Followers: 11, Likes: 7, Views: 4, Comments: 19 }
+    }
+  },
+  EUROPE: {
+    name: 'Europe',
+    perK: {
+      Instagram: { Followers: 11, Likes: 8.5, Views: 4.5, Comments: 21 },
+      Facebook:  { Followers: 10, Likes: 6.5, Views: 4.5, Comments: 19 },
+      YouTube:   { Subscribers: 15, Likes: 7.2, Views: 5.3, Comments: 23 },
+      TikTok:    { Followers: 12, Likes: 7.5, Views: 4.5, Comments: 20 }
+    }
+  },
+  PAK: {
+    name: 'Pakistan',
+    perK: {
+      Instagram: { Followers: 7, Likes: 5, Views: 3, Comments: 14 },
+      Facebook:  { Followers: 6.5, Likes: 4.2, Views: 2.8, Comments: 12 },
+      YouTube:   { Subscribers: 9, Likes: 4.8, Views: 3.6, Comments: 15 },
+      TikTok:    { Followers: 7.5, Likes: 5, Views: 3, Comments: 14 }
+    }
+  },
+  INDIA: {
+    name: 'India',
+    perK: {
+      Instagram: { Followers: 6.5, Likes: 4.2, Views: 2.6, Comments: 12 },
+      Facebook:  { Followers: 6, Likes: 3.9, Views: 2.4, Comments: 11 },
+      YouTube:   { Subscribers: 8.2, Likes: 4.5, Views: 3.2, Comments: 14 },
+      TikTok:    { Followers: 7, Likes: 4.4, Views: 2.7, Comments: 12 }
+    }
+  },
+  DEFAULT: {
+    name: 'Global (USD)',
+    perK: {
+      Instagram: { Followers: 9, Likes: 6.5, Views: 3.8, Comments: 17 },
+      Facebook:  { Followers: 8.5, Likes: 6, Views: 3.6, Comments: 16 },
+      YouTube:   { Subscribers: 12, Likes: 6.8, Views: 4.6, Comments: 20 },
+      TikTok:    { Followers: 10, Likes: 6.8, Views: 3.9, Comments: 17 }
+    }
+  }
+};
+
+// Currency conversion rates (from USD). Update as needed.
+const FX = { USD: 1, EUR: 0.9, PKR: 280, INR: 84 };
+const CURRENCIES = ['PKR','INR','USD','EUR'];
+
+// Quantity presets to show as mini price list
+const QTY_PRESETS = [200, 500, 1000, 5000, 10000];
+
+// Platform icons (SVG emojis/simple)
+const ICONS = {
+  Instagram:'📸', Facebook:'📘', YouTube:'▶️', TikTok:'🎵'
+};
+
+// Service options per platform (labels must match PRICE_LISTS keys)
+const SERVICE_OPTIONS = {
+  Instagram: ['Followers','Likes','Views','Comments'],
+  Facebook:  ['Followers','Likes','Views','Comments','Page Followers','Page Likes'],
+  YouTube:   ['Subscribers','Likes','Views','Comments'],
+  TikTok:    ['Followers','Likes','Views','Comments']
+};
+
+// Dynamic placeholder text per (platform, service)
+function placeholderFor(platform, service){
+  const base = {
+    Followers: 'Enter profile/account link',
+    Likes: 'Enter post/reel/video link',
+    Views: 'Enter post/reel/video link',
+    Comments: 'Enter post link',
+    'Page Followers': 'Enter Facebook Page link',
+    'Page Likes': 'Enter Facebook Page link',
+    Subscribers: 'Enter YouTube Channel link'
+  };
+  // Special-cases
+  if(platform==='YouTube' && service==='Likes') return 'Enter YouTube video link';
+  if(platform==='YouTube' && service==='Views') return 'Enter YouTube video link';
+  if(platform==='Facebook' && service==='Likes') return 'Enter Facebook post link';
+  return base[service] || 'Enter link';
+}
+
+// ------------- State -------------
+let detectedRegionKey = 'DEFAULT'; // USA | EUROPE | PAK | INDIA | DEFAULT
+let activeCurrency = 'USD';
+
+// ------------- Helpers -------------
+function money(usd){
+  const v = usd * (FX[activeCurrency]||1);
+  // Rounding rules
+  let out = 0;
+  if(activeCurrency==='PKR' || activeCurrency==='INR') out = Math.round(v);
+  else out = Math.round(v*100)/100;
+  const symbol = {USD:'$', EUR:'€', PKR:'₨', INR:'₹'}[activeCurrency]||'';
+  return `${symbol}${out.toLocaleString()}`;
+}
+
+function detectRegionLabel(r){
+  return ({USA:'United States',EUROPE:'Europe',PAK:'Pakistan',INDIA:'India',DEFAULT:'Global'})[r]||'Global';
+}
+
+function getPricePerK(platform, service){
+  const list = PRICE_LISTS[detectedRegionKey] || PRICE_LISTS.DEFAULT;
+  const p = list.perK[platform] && list.perK[platform][service];
+  // Fallback: if service missing (like Page Followers) map to Followers
+  if(!p){
+    const map = {'Page Followers':'Followers','Page Likes':'Likes'};
+    const alt = map[service];
+    if(alt && list.perK[platform] && list.perK[platform][alt]) return list.perK[platform][alt];
+    // final fallback to DEFAULT list
+    const d = PRICE_LISTS.DEFAULT.perK[platform] && PRICE_LISTS.DEFAULT.perK[platform][service];
+    if(d) return d;
+  }
+  return p || 10; // safe default
+}
+
+function computeTotal(platform, service, qty){
+  const perK = getPricePerK(platform, service);
+  const usd = (perK * qty) / 1000;
+  return { usd, display: money(usd) };
+}
+
+// ------------- UI Build -------------
+function buildCurrencySwitcher(){
+  const wrap = document.getElementById('currencySwitcher');
+  wrap.innerHTML = '';
+  CURRENCIES.forEach(cur=>{
+    const el = document.createElement('button');
+    el.className = 'chip' + (cur===activeCurrency?' active':'');
+    el.textContent = cur;
+    el.onclick = ()=>{ activeCurrency = cur; buildCards(); updateModalTotals(); };
+    wrap.appendChild(el);
+  });
+}
+
+function buildCards(){
+  const grid = document.getElementById('cardsGrid');
+  grid.innerHTML = '';
+  const platforms = ['Instagram','Facebook','YouTube','TikTok'];
+  platforms.forEach(platform=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="head"> <span style="font-size:22px">${ICONS[platform]}</span> ${platform}</div>
+      <div class="field">
+        <label>Service</label>
+        <select class="svc"></select>
+      </div>
+      <div class="field">
+        <label>Quantity</label>
+        <select class="qty"></select>
+      </div>
+      <div class="field">
+        <label>Link</label>
+        <input class="linkInput" placeholder="Enter link">
+      </div>
+      <div class="price-table" aria-live="polite"></div>
+      <div class="buy"><button class="btn buyBtn">Buy Now</button></div>
+    `;
+
+    // Service options
+    const svc = card.querySelector('.svc');
+    (SERVICE_OPTIONS[platform]||[]).forEach(s=>{
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s; svc.appendChild(opt);
+    });
+
+    // Quantity options
+    const qtySel = card.querySelector('.qty');
+    QTY_PRESETS.forEach(q=>{
+      const opt = document.createElement('option');
+      opt.value = q; opt.textContent = q.toLocaleString(); qtySel.appendChild(opt);
+    });
+
+    // Dynamic placeholder + price table
+    function refresh(){
+      const s = svc.value; const q = Number(qtySel.value);
+      const link = card.querySelector('.linkInput');
+      link.placeholder = placeholderFor(platform, s);
+      const tbl = card.querySelector('.price-table');
+      tbl.innerHTML = '';
+      QTY_PRESETS.forEach(qi=>{
+        const t = computeTotal(platform, s, qi);
+        const rowL = document.createElement('div');
+        rowL.textContent = `${qi.toLocaleString()} ${s} —`;
+        const rowR = document.createElement('div');
+        rowR.style.textAlign='right';
+        rowR.textContent = t.display;
+        tbl.appendChild(rowL); tbl.appendChild(rowR);
+      });
+    }
+
+    svc.onchange = refresh; qtySel.onchange = refresh; refresh();
+
+    // Buy Now → open modal
+    const btn = card.querySelector('.buyBtn');
+    btn.onclick = ()=>{
+      const s = svc.value; const q = Number(qtySel.value); const link = card.querySelector('.linkInput').value.trim();
+      const total = computeTotal(platform, s, q);
+      openModal({platform, service:s, qty:q, link, total});
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+// ------------- Modal Logic -------------
+let modalState = null;
+function openModal({platform, service, qty, link, total}){
+  modalState = { platform, service, qty, link, total };
+  document.getElementById('mPlatform').value = platform;
+  document.getElementById('mService').value = service;
+  document.getElementById('mQty').value = qty.toLocaleString();
+  document.getElementById('mLink').value = link || '—';
+  document.getElementById('mTotal').value = total.display;
+  buildPaymentBox();
+  document.getElementById('overlay').style.display='flex';
+}
+function updateModalTotals(){
+  if(!modalState) return;
+  const t = computeTotal(modalState.platform, modalState.service, modalState.qty);
+  document.getElementById('mTotal').value = t.display;
+}
+function closeModal(){
+  document.getElementById('overlay').style.display='none'; modalState = null;
+}
+
+function buildPaymentBox(){
+  const wrap = document.getElementById('paymentBox');
+  wrap.innerHTML = '';
+  const region = detectedRegionKey;
+  if(region==='PAK'){ // EasyPaisa / JazzCash
+    wrap.innerHTML = `
+      <div><strong>Make payment with EasyPaisa or JazzCash</strong></div>
+      <div class="muted">After the payment, please add screenshot in the dropdown below; we will confirm your payment then start your order instantly.</div>
+      <div><strong>Name:</strong> Muhammad Wasif</div>
+      <div><strong>Number:</strong> <span id="pkNumber">03266438812</span> <button class="copy" onclick="copyText('pkNumber')">📋 Copy</button></div>
+      <div class="muted">If you want to pay with another method, contact us on WhatsApp.</div>
+      <a class="btn" target="_blank" rel="noopener" href="https://wa.me/${SUPPORT_WA_NUMBER}?text=${SUPPORT_WA_TEXT}">Contact on WhatsApp</a>
+    `;
+  } else if(region==='INDIA' || region==='ASIA'){ // Paytm / PhonePe / GPay / UPI
+    wrap.innerHTML = `
+      <div><strong>Make payment with Paytm, PhonePe, GPay, or UPI</strong></div>
+      <div class="muted">After the payment, please add screenshot in the dropdown below; we will confirm your payment then start your order instantly.</div>
+      <div><strong>Name:</strong> Wasif</div>
+      <div class="field"><label>UPI / Wallet QR Code</label><input type="file" accept="image/*"></div>
+      <div class="muted">If you want to pay with another method, contact us on WhatsApp.</div>
+      <a class="btn" target="_blank" rel="noopener" href="https://wa.me/${SUPPORT_WA_NUMBER}?text=${SUPPORT_WA_TEXT}">Contact on WhatsApp</a>
+    `;
+  } else { // PayPal
+    wrap.innerHTML = `
+      <div><strong>Make payment with PayPal</strong></div>
+      <div class="muted">After the payment, please add screenshot in the dropdown below; we will confirm your payment then start your order instantly.</div>
+    `;
+  }
+}
+
+// Submit → WhatsApp redirect with details
+function buildWhatsAppOrderText(){
+  const shot = document.getElementById('mShot');
+  const notes = document.getElementById('mNotes').value.trim();
+  const details = `Order Details:%0APlatform: ${encodeURIComponent(modalState.platform)}%0AService: ${encodeURIComponent(modalState.service)}%0AQuantity: ${encodeURIComponent(modalState.qty)}%0ALink: ${encodeURIComponent(modalState.link||'—')}%0AScreenshot: ${shot && shot.files && shot.files[0] ? 'Uploaded' : 'Not uploaded'}%0AAdditional Comments: ${encodeURIComponent(notes||'—')}%0A%0ANote: I didn't receive your payment screenshot yet. Please send your payment screenshot again.%0AOnce your payment is confirmed, your order will be processed instantly.%0AThank you for choosing our services!`;
+  return details;
+}
+
+// ------------- Geo IP detection -------------
+async function detectRegion(){
+  try{
+    // Try ipapi (no key for demo). Replace with your preferred service.
+    const r = await fetch('https://ipapi.co/json/');
+    if(!r.ok) throw new Error('ipapi failed');
+    const data = await r.json();
+    const cc = (data.country || '').toUpperCase();
+    const cont = (data.continent_code || '').toUpperCase();
+
+    if(cc==='US') detectedRegionKey = 'USA';
+    else if(cc==='PK') detectedRegionKey = 'PAK';
+    else if(cc==='IN') detectedRegionKey = 'INDIA';
+    else if(['AL','AD','AT','BY','BE','BA','BG','CH','CY','CZ','DE','DK','EE','ES','FI','FR','GB','GR','HR','HU','IE','IS','IT','LI','LT','LU','LV','MC','MD','ME','MK','MT','NL','NO','PL','PT','RO','RS','RU','SE','SI','SK','SM','UA','VA'].includes(cc)) detectedRegionKey = 'EUROPE';
+    else if(cont==='AS') detectedRegionKey = 'ASIA'; // Asia except PK handled above
+    else detectedRegionKey = 'DEFAULT';
+
+    document.getElementById('regionText').textContent = `${detectRegionLabel(detectedRegionKey)} (${cc||'—'})`;
+    document.getElementById('priceListName').textContent = (PRICE_LISTS[detectedRegionKey]||PRICE_LISTS.DEFAULT).name;
+  }catch(e){
+    detectedRegionKey = 'DEFAULT';
+    document.getElementById('regionText').textContent = 'Global (fallback)';
+    document.getElementById('priceListName').textContent = PRICE_LISTS.DEFAULT.name;
+  } finally {
+    buildCards(); // refresh prices with detected region
+  }
+}
+
+// ------------- Utilities -------------
+function copyText(elId){
+  const el = document.getElementById(elId);
+  const text = el ? el.textContent : '';
+  if(!text) return;
+  navigator.clipboard.writeText(text).then(()=>{
+    alert('Copied: '+text);
+  });
+}
+
+// Support WhatsApp floating button
+function buildSupportWA(){
+  const a = document.getElementById('supportWhatsApp');
+  a.href = `https://wa.me/${SUPPORT_WA_NUMBER}?text=${SUPPORT_WA_TEXT}`;
+}
+
+// Modal buttons
+document.getElementById('cancelBtn').onclick = closeModal;
+
+document.getElementById('submitBtn').onclick = ()=>{
+  if(!modalState) return;
+  const msg = buildWhatsAppOrderText();
+  window.open(`https://wa.me/${SUPPORT_WA_NUMBER}?text=${msg}`, '_blank');
+};
+
+// Init
+buildCurrencySwitcher();
+buildSupportWA();
+detectRegion();
+
+</script>
+</body>
+</html>
