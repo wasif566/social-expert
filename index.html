@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Country Based Pricing</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding:20px; }
+    .card { border:1px solid #ccc; padding:15px; margin:10px; border-radius:8px; }
+    h2 { margin-top:0; }
+  </style>
+</head>
+<body>
+
+<h1>Social Media Services</h1>
+<p id="detected-country">Detecting your location...</p>
+
+<div class="card" id="pricing">
+  <!-- Prices will load here -->
+</div>
+
+<script>
+// Pakistan price list
+const pkPrices = `
+  <h2>Prices (PKR)</h2>
+  <ul>
+    <li>1,000 Followers – ₨720</li>
+    <li>1,000 Likes – ₨430</li>
+    <li>1,000 Views – ₨280</li>
+    <li>1,000 Comments – ₨950</li>
+  </ul>
+`;
+
+// USA price list
+const usPrices = `
+  <h2>Prices (USD)</h2>
+  <ul>
+    <li>1,000 Followers – $6</li>
+    <li>1,000 Likes – $3.5</li>
+    <li>1,000 Views – $2.5</li>
+    <li>1,000 Comments – $9</li>
+  </ul>
+`;
+
+// Default (if not Pakistan or USA)
+const defaultPrices = `
+  <h2>Prices (Default USD)</h2>
+  <ul>
+    <li>1,000 Followers – $6</li>
+    <li>1,000 Likes – $3.5</li>
+    <li>1,000 Views – $2.5</li>
+    <li>1,000 Comments – $9</li>
+  </ul>
+`;
+
+// Detect user country with ipapi.co
+fetch("https://ipapi.co/json/")
+  .then(res => res.json())
+  .then(data => {
+    let country = data.country_name;
+    document.getElementById("detected-country").innerText = 
+      `You are visiting from: ${country}`;
+
+    if (country === "Pakistan") {
+      document.getElementById("pricing").innerHTML = pkPrices;
+    } else if (country === "United States") {
+      document.getElementById("pricing").innerHTML = usPrices;
+    } else {
+      document.getElementById("pricing").innerHTML = defaultPrices;
+    }
+  })
+  .catch(() => {
+    document.getElementById("detected-country").innerText = "Could not detect location";
+    document.getElementById("pricing").innerHTML = defaultPrices;
+  });
+</script>
+
+</body>
+</html>
