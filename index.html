@@ -1566,7 +1566,7 @@ async function detectLocation() {
         switch (detectedCountry) {
             case 'PK': 
                 baseCurrency = 'PKR'; 
-         
+                  displayCurrency = 'PKR'; 
                 break;
 
             case 'IN': 
@@ -1616,8 +1616,10 @@ case 'TL': case 'MN': case 'MV':
         isOtherAsian = false;
     }
 
-    await fetchExchangeRates();
-      updateCurrencyDisplay(); // ✅ make sure dropdown & UI reflect detection
+   await fetchExchangeRates();
+    updateCurrencyDisplay();     // ✅ sync flag + dropdown
+    initializeQuantityOptions(); // ✅ refresh service prices with detected currency
+    updateCartCurrency();        // ✅ refresh cart prices if any
 }
 
 // Fetch exchange rates
@@ -1649,17 +1651,7 @@ function updateCurrencyDisplay() {
 
     if(flagElement) flagElement.src = countryFlags[detectedCountry] || countryFlags['US'];
     if(currencyElement) currencyElement.textContent = `${baseCurrency} (${currencySymbols[baseCurrency]})`;
-  if(selectElement){
-    // Ensure the dropdown matches detected/display currency
-    selectElement.value = displayCurrency;
-
-    // If the detected currency is not in the dropdown options, fallback to USD
-    if (![...selectElement.options].some(opt => opt.value === displayCurrency)) {
-        selectElement.value = 'USD';
-        displayCurrency = 'USD';
-    }
-}
-
+    if(selectElement) selectElement.value = displayCurrency;
 }
 
 // Convert price between currencies
