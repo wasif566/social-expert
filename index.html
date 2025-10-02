@@ -10,8 +10,6 @@
 <meta property="og:type" content="website" />
 
 <!-- Google tag (gtag.js) -->
-
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6VQB5T90XD"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -33,13 +31,78 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 fbq('init', '681008867627635');
 fbq('track', 'PageView');
 </script>
-
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=681008867627635&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
-
     <style>
+.custom-wrapper {
+    display: flex;
+    flex-direction: column; /* keeps notes/errors stacked below */
+    gap: 4px;
+    margin-top: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e0e0; /* subtle separator */
+}
+
+.custom-row {
+    display: flex;
+    flex-direction: row;   /* always row (inline) */
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;             /* space between input and price */
+    flex-wrap: nowrap;     /* prevent breaking to new line */
+}
+
+.custom-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #222;
+}
+
+.custom-input {
+    width: 50px;           /* fixed width */
+    max-width: 52%;        /* responsive up to ~half container */
+    padding: 6px 8px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0,123,255,0.3);
+}
+
+.custom-price {
+    font-weight: 600;
+    font-size: 18px;
+    color: #007bff;
+    white-space: nowrap;   /* prevent wrapping */
+}
+
+.qty-note,
+.qty-error {
+    font-size: 12px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.qty-note {
+    color: #666;
+    font-style: italic;
+}
+
+.qty-error {
+    color: #d93025;
+    font-weight: 500;
+}
+
+/* 🚫 Removed media query override */
+
+
         * {
             margin: 0;
             padding: 0;
@@ -1082,6 +1145,48 @@ background: linear-gradient(135deg, #2b1055 0%, #7597de 100%);
     background: #999;
 }
 
+/* Custom Quantity Input */
+.custom-qty-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 6px;
+  outline: none;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.custom-qty-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+/* Quantity Note */
+.qty-note {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Error message */
+.qty-error {
+  font-size: 12px;
+  color: red;
+  margin-top: 4px;
+  display: none;
+}
+
+/* Price Display */
+.custom-price-display {
+  font-size: 13px;
+  font-weight: bold;
+  color: #222;
+  margin-top: 6px;
+  display: none; /* hidden until input valid */
+}
+
+
 /* ================= Responsive ================= */
 
 /* Tablets & small laptops */
@@ -1701,6 +1806,7 @@ function getDiscountPercent(service, qty) {
     }
     return percent;
 }
+
 function updateQuantityOptions(platform) {
     const serviceSelect = document.getElementById(`${platform}Service`);
     const quantitySelect = document.getElementById(`${platform}Quantity`);
@@ -1710,16 +1816,17 @@ function updateQuantityOptions(platform) {
     if (!basePrices[baseCurrency] || !basePrices[baseCurrency][platform] || !basePrices[baseCurrency][platform][selectedService]) return;
 
     const basePrice = basePrices[baseCurrency][platform][selectedService];
-    const quantities = selectedService === "comments" ? discountRules.comments.map(r => r.minQty) : discountRules.other.map(r => r.minQty);
+    const quantities = selectedService === "comments" 
+        ? discountRules.comments.map(r => r.minQty) 
+        : discountRules.other.map(r => r.minQty);
     quantitySelect.innerHTML = '';
 
+    // Predefined options
     quantities.forEach(qty => {
         let totalBasePrice = (basePrice * qty) / 1000;
         const percent = getDiscountPercent(selectedService, qty);
-        if (percent !== 0) totalBasePrice = totalBasePrice * (1 - percent / 100);
-
-        // ✅ Apply 30% discount for other Asian countries
-        if (isOtherAsian) totalBasePrice = totalBasePrice * 0.7;
+        if (percent !== 0) totalBasePrice *= (1 - percent / 100);
+        if (isOtherAsian) totalBasePrice *= 0.7;
 
         const displayPrice = convertPrice(totalBasePrice, baseCurrency, displayCurrency);
         const option = document.createElement('option');
@@ -1728,7 +1835,95 @@ function updateQuantityOptions(platform) {
         option.textContent = `${qty.toLocaleString()} ${getServiceLabel(platform, selectedService)} – ${formatPrice(displayPrice, displayCurrency)}`;
         quantitySelect.appendChild(option);
     });
+
+    // Add custom option
+const customOption = document.createElement('option');
+customOption.value = "custom";
+customOption.textContent = "Select Custom Quantity...";
+customOption.style.fontWeight = "bold"; // make it bold
+quantitySelect.appendChild(customOption);
+
+    // Handle custom input dynamically
+    quantitySelect.addEventListener('change', function() {
+        let existingWrapper = document.getElementById(`${platform}CustomWrapper`);
+        if (existingWrapper) existingWrapper.remove();
+
+        if (this.value === "custom") {
+            const wrapper = document.createElement('div');
+            wrapper.id = `${platform}CustomWrapper`;
+            wrapper.className = "custom-wrapper";
+
+            // Row for input + price
+            const row = document.createElement('div');
+            row.className = "custom-row";
+
+            const customInput = document.createElement('input');
+            customInput.type = "number";
+            customInput.min = (selectedService === "comments") ? 50 : 200;
+            customInput.max = (selectedService === "comments") ? 100000 : 10000000;
+            customInput.placeholder = "Enter Quantity";
+            customInput.id = `${platform}CustomQty`;
+            customInput.className = "custom-input";
+
+            const priceLine = document.createElement('span');
+            priceLine.id = `${platform}CustomPrice`;
+            priceLine.className = "custom-price";
+
+            row.appendChild(customInput);
+            row.appendChild(priceLine);
+            wrapper.appendChild(row);
+
+            // Notes and error below
+            const note = document.createElement('p');
+            note.className = "qty-note";
+            note.textContent = (selectedService === "comments") 
+                ? "Min 50 - Max 100,000" 
+                : "Min 200 - Max 10,000,000";
+
+            const error = document.createElement('p');
+            error.id = `${platform}CustomError`;
+            error.className = "qty-error";
+
+            wrapper.appendChild(note);
+            wrapper.appendChild(error);
+
+            quantitySelect.parentNode.appendChild(wrapper);
+
+            // Live validation + price calculation
+            customInput.addEventListener('input', () => {
+                const qty = parseInt(customInput.value);
+                const min = parseInt(customInput.min);
+                const max = parseInt(customInput.max);
+
+                const errorMsg = document.getElementById(`${platform}CustomError`);
+                const priceDisplay = document.getElementById(`${platform}CustomPrice`);
+
+                if (!isNaN(qty) && qty >= min && qty <= max) {
+                    errorMsg.style.display = "none";
+
+                    let totalBasePrice = (basePrice * qty) / 1000;
+                    const percent = getDiscountPercent(selectedService, qty);
+                    if (percent !== 0) totalBasePrice *= (1 - percent / 100);
+                    if (isOtherAsian) totalBasePrice *= 0.7;
+
+                    const displayPrice = convertPrice(totalBasePrice, baseCurrency, displayCurrency);
+                    customInput.dataset.price = displayPrice;
+
+                    priceDisplay.style.display = "inline-block";
+                    priceDisplay.textContent = `${formatPrice(displayPrice, displayCurrency)}`;
+                } else {
+                    errorMsg.style.display = "block";
+                    errorMsg.textContent = `Enter a valid quantity (Min ${min}, Max ${max})`;
+                    priceDisplay.style.display = "none";
+                    customInput.dataset.price = 0;
+                }
+            });
+        }
+    });
 }
+
+
+
 
 
 // Get proper service label
@@ -1801,9 +1996,28 @@ function addToCart(platform) {
     const urlInput = document.getElementById(`${platform}Url`);
 
     const service = serviceSelect.value;
-    const quantity = parseInt(quantitySelect.value);
+    let quantity, displayPrice;
+
+    if (quantitySelect.value === "custom") {
+        const customInput = document.getElementById(`${platform}CustomQty`);
+        const errorMsg = document.getElementById(`${platform}CustomError`);
+        quantity = parseInt(customInput.value);
+        displayPrice = parseFloat(customInput.dataset.price || 0);
+
+        const min = parseInt(customInput.min);
+        const max = parseInt(customInput.max);
+
+        if (!quantity || quantity < min || quantity > max) {
+            errorMsg.style.display = "block";
+            errorMsg.textContent = `Enter a valid quantity (Min ${min}, Max ${max})`;
+            return;
+        }
+    } else {
+        quantity = parseInt(quantitySelect.value);
+        displayPrice = parseFloat(quantitySelect.options[quantitySelect.selectedIndex].dataset.price);
+    }
+
     const url = urlInput.value.trim();
-    const displayPrice = parseFloat(quantitySelect.options[quantitySelect.selectedIndex].dataset.price);
     const basePrice = convertPrice(displayPrice, displayCurrency, baseCurrency);
 
     if (!url || !validateUrl(platform, service, url)) {
@@ -1812,7 +2026,7 @@ function addToCart(platform) {
     }
 
     cart.push({ platform, service, quantity, url, displayPrice, basePrice });
-    saveCart(); // ✅ Save after adding
+    saveCart();
     renderCart();
     openCart();
 }
@@ -2039,7 +2253,3 @@ renderCart = (function(originalRenderCart){
     </script>
 </body>
 </html>
-
-
-
-
