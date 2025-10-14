@@ -2136,12 +2136,13 @@ async function checkout() {
         // Save to localStorage
         localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
 
-        // ✅ Simulate successful transfer
-        setTimeout(() => {
-            hideLoader(); // stop loader
-            showToast('Checkout successful! Redirecting...', 'success');
-            window.open('checkout.html', '_blank'); // redirect
-        }, 1500);
+      // ✅ Simulate successful transfer
+setTimeout(() => {
+    hideLoader(); // stop loader
+    showToast('Checkout successful! Redirecting...', 'success');
+    window.location.href = 'checkout.html'; // ✅ iOS compatible redirect
+}, 1500);
+
 
     } catch (error) {
         hideLoader();
