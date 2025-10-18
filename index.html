@@ -2175,29 +2175,25 @@ async function checkout() {
 
         // Save to localStorage
         localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
-        
- // ✅ 1️⃣ Open tab immediately on user gesture (Safari-safe)
-  const checkoutTab = window.open('', '_blank');
-  if (!checkoutTab) {
-    alert('Please allow popups for this site to continue checkout.');
-    return;
-  }
+   // ✅ Step 1: Wait 1 second, then show toast message
+setTimeout(() => {
+  hideLoader(); // make sure no loader visible
+  showToast('Checkout successful! Redirecting...', 'success');
 
-  // ✅ 2️⃣ Show success toast
-  hideLoader();
-  showToast('✅ Checkout successful! Redirecting...', 'success');
-
-  // ✅ 3️⃣ Wait 1s → show loader
+  // ✅ Step 2: After toast, show loader for 1.5 seconds
   setTimeout(() => {
     showLoader();
 
-    // ✅ 4️⃣ Wait 1.5s → redirect new tab
+    // ✅ Step 3: Redirect safely after 1.5 seconds
     setTimeout(() => {
       hideLoader();
-      checkoutTab.location.href = 'checkout.html'; // ✅ Now works in Safari!
-    }, 1500);
+      window.location.href = 'checkout.html'; // Works in all browsers including Safari
+    }, 1000);
 
-  }, 1000);
+  }, 1500); // Toast visible duration (1s)
+
+}); // Initial delay before showing message
+
 
     } catch (error) {
         hideLoader();
