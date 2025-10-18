@@ -2054,6 +2054,19 @@ function addToCart(platform) {
     }
 
     cart.push({ platform, service, quantity, url, displayPrice, basePrice });
+      // ✅ Step: Facebook Pixel AddToCart
+    if (typeof fbq === 'function') {
+        fbq('track', 'AddToCart', {
+            content_name: service,
+            content_category: platform,
+            value: displayPrice,
+            currency: displayCurrency,
+            quantity: quantity,
+            content_ids: [platform + '_' + service]
+        });
+        console.log(`📊 Meta Pixel Event Sent: AddToCart for ${platform} - ${service}`);
+    }
+
     saveCart();
     renderCart();
     openCart();
