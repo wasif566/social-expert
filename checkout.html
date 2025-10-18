@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Order Summary</title>
+
+  <script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '681008867627635');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=681008867627635&ev=PageView&noscript=1"
+/></noscript>
   <style>
 /* 🌐 General Reset */
 * {
@@ -516,6 +532,21 @@ font-size: 16px;
 
     // ✅ Confirm button → WhatsApp message
     document.getElementById('confirmCheckout').addEventListener('click', () => {
+      if (typeof fbq === 'function' && checkoutData && checkoutData.cart) {
+  // Step 1: InitiateCheckout → user is submitting order
+  fbq('track', 'InitiateCheckout', {
+    currency: checkoutData.baseCurrency,
+    value: checkoutData.total,
+    num_items: checkoutData.cart.length
+  });
+
+  // Step 2: Purchase → same click = considered purchase
+  fbq('track', 'Purchase', {
+    currency: checkoutData.baseCurrency,
+    value: checkoutData.total
+  });
+}
+
       const comment = document.getElementById('additionalComment').value;
       const screenshot = document.getElementById('paymentScreenshot').files[0];
 
@@ -550,6 +581,7 @@ font-size: 16px;
 
     // Load payments
     populatePaymentSection();
+    
   </script>
 </body>
 </html>
