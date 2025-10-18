@@ -7,8 +7,8 @@
 <meta property="og:description" content="Get premium social media services to grow your followers, likes on Instagram, TikTok, YouTube & more. Fast delivery. 100% safe & trusted." />
 <meta property="og:image" content="https://socialexpert.online/media-banner.png" />
 <meta property="og:url" content="https://socialexpert.online" />
-    <meta name="facebook-domain-verification" content="p3j0kjqqnijhebw5zcooic0bi8g1j6" />
 <meta property="og:type" content="website" />
+
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6VQB5T90XD"></script>
@@ -20,7 +20,7 @@
   gtag('config', 'G-6VQB5T90XD');
 </script>
 
-    <!-- TikTok Pixel Code Start -->
+<!-- TikTok Pixel Code Start -->
 <script>
 !function (w, d, t) {
   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
@@ -33,6 +33,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 }(window, document, 'ttq');
 </script>
 <!-- TikTok Pixel Code End -->
+
       <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -1989,6 +1990,18 @@ function setupEventListeners() {
         const addToCartBtn = document.getElementById(`${platform}AddToCart`);
         if(serviceSelect){
             serviceSelect.addEventListener('change', () => {
+                // ✅ Meta Pixel: ViewContent when user selects a service
+    if (typeof fbq === 'function') {
+        const service = serviceSelect.value;
+        fbq('track', 'ViewContent', {
+            content_name: service,
+            content_category: platform,
+            currency: displayCurrency,
+            value: basePrices[baseCurrency][platform][service] || 0,
+            content_ids: [platform + '_' + service]
+        });
+        console.log(`📊 ViewContent sent for ${platform} - ${service}`);
+    }
                 updateQuantityOptions(platform);
                 updatePlaceholder(platform);
             });
@@ -2044,6 +2057,18 @@ function addToCart(platform) {
     saveCart();
     renderCart();
     openCart();
+    // ✅ Meta Pixel Tracking: User added a service to cart (shows interest)
+if (typeof fbq === 'function') {
+  fbq('track', 'AddToCart', {
+    content_name: service,
+    content_category: platform,
+    value: displayPrice,
+    currency: displayCurrency,
+    quantity: quantity,
+    content_ids: [platform + '_' + service]
+  });
+  console.log('📊 Meta Pixel Event Sent: AddToCart');
+}
 }
 
 function removeCartItem(index) {
@@ -2151,12 +2176,51 @@ async function checkout() {
         // Save to localStorage
         localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
 
-      // ✅ Simulate successful transfer
+ // ✅ Simulate successful transfer (show message, then loader, then redirect)
+hideLoader(); // stop loader if visible
+showToast('Checkout successful! Redirecting...', 'success');
+
+// Step 1️⃣: Wait 5 seconds to show success message
 setTimeout(() => {
-    hideLoader(); // stop loader
-    showToast('Checkout successful! Redirecting...', 'success');
-    window.location.href = 'checkout.html'; // ✅ iOS compatible redirect
-}, 1500);
+    showLoader(); // Step 2️⃣: Show loader for 1.5s
+
+    setTimeout(() => {
+        hideLoader();
+
+        const checkoutURL = 'checkout.html';
+
+        try {
+            // ✅ Cross-browser safe method for new tab open (including Safari)
+            const link = document.createElement('a');
+            link.href = checkoutURL;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+
+            // Simulate a user click → works on Safari iOS
+            const clickEvent = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+            });
+            link.dispatchEvent(clickEvent);
+
+            // Cleanup
+            document.body.removeChild(link);
+
+            // ✅ Optional: ensure focus moves to new tab (if allowed)
+            if (document.visibilityState === 'visible') {
+                window.focus();
+            }
+        } catch (e) {
+            console.error('New tab open failed:', e);
+        }
+
+    }, 1500); // loader duration
+
+}, 1000); // success message duration
+
 
 
     } catch (error) {
@@ -2269,5 +2333,3 @@ renderCart = (function(originalRenderCart){
     </script>
 </body>
 </html>
-
-
