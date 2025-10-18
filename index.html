@@ -2176,42 +2176,28 @@ async function checkout() {
         // Save to localStorage
         localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
         
-// ✅ Step 1: Immediately show the toast message
-hideLoader(); // Ensure no loader is visible
-showToast('Checkout successful! Redirecting...', 'success');
+ // ✅ 1️⃣ Open tab immediately on user gesture (Safari-safe)
+  const checkoutTab = window.open('', '_blank');
+  if (!checkoutTab) {
+    alert('Please allow popups for this site to continue checkout.');
+    return;
+  }
 
-// ✅ Force a short render delay before anything else (Safari-safe)
-setTimeout(() => {
-  // ✅ Step 2: Show loader for 1.5 seconds (smooth transition)
-  showLoader();
+  // ✅ 2️⃣ Show success toast
+  hideLoader();
+  showToast('✅ Checkout successful! Redirecting...', 'success');
 
+  // ✅ 3️⃣ Wait 1s → show loader
   setTimeout(() => {
-    hideLoader();
+    showLoader();
 
-    // ✅ Step 3: Open checkout.html in a NEW TAB (safe for all browsers)
-    const checkoutURL = 'checkout.html';
-    const a = document.createElement('a');
-    a.href = checkoutURL;
-    a.target = '_blank';
-    a.rel = 'noopener noreferrer';
-    a.style.display = 'none';
-    document.body.appendChild(a);
+    // ✅ 4️⃣ Wait 1.5s → redirect new tab
+    setTimeout(() => {
+      hideLoader();
+      checkoutTab.location.href = 'checkout.html'; // ✅ Now works in Safari!
+    }, 1500);
 
-    // ✅ Simulate a real user click (so Safari won’t block it)
-    const clickEvent = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true
-    });
-    a.dispatchEvent(clickEvent);
-    document.body.removeChild(a);
-
-  }, 1500); // Loader duration (1.5s)
-
-}, 1000); // Toast visible duration (1s)
-
-
-
+  }, 1000);
 
     } catch (error) {
         hideLoader();
