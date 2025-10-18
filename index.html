@@ -2175,51 +2175,41 @@ async function checkout() {
 
         // Save to localStorage
         localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
-
- // ✅ Simulate successful transfer (show message, then loader, then redirect)
-hideLoader(); // stop loader if visible
+        
+// ✅ Step 1: Immediately show the toast message
+hideLoader(); // Ensure no loader is visible
 showToast('Checkout successful! Redirecting...', 'success');
 
-// Step 1️⃣: Wait 5 seconds to show success message
+// ✅ Force a short render delay before anything else (Safari-safe)
 setTimeout(() => {
-    showLoader(); // Step 2️⃣: Show loader for 1.5s
+  // ✅ Step 2: Show loader for 1.5 seconds (smooth transition)
+  showLoader();
 
-    setTimeout(() => {
-        hideLoader();
+  setTimeout(() => {
+    hideLoader();
 
-        const checkoutURL = 'checkout.html';
+    // ✅ Step 3: Open checkout.html in a NEW TAB (safe for all browsers)
+    const checkoutURL = 'checkout.html';
+    const a = document.createElement('a');
+    a.href = checkoutURL;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.style.display = 'none';
+    document.body.appendChild(a);
 
-        try {
-            // ✅ Cross-browser safe method for new tab open (including Safari)
-            const link = document.createElement('a');
-            link.href = checkoutURL;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.style.display = 'none';
-            document.body.appendChild(link);
+    // ✅ Simulate a real user click (so Safari won’t block it)
+    const clickEvent = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true
+    });
+    a.dispatchEvent(clickEvent);
+    document.body.removeChild(a);
 
-            // Simulate a user click → works on Safari iOS
-            const clickEvent = new MouseEvent('click', {
-                view: window,
-                bubbles: true,
-                cancelable: true
-            });
-            link.dispatchEvent(clickEvent);
+  }, 1500); // Loader duration (1.5s)
 
-            // Cleanup
-            document.body.removeChild(link);
+}, 1000); // Toast visible duration (1s)
 
-            // ✅ Optional: ensure focus moves to new tab (if allowed)
-            if (document.visibilityState === 'visible') {
-                window.focus();
-            }
-        } catch (e) {
-            console.error('New tab open failed:', e);
-        }
-
-    }, 1500); // loader duration
-
-}, 1000); // success message duration
 
 
 
