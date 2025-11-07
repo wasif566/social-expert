@@ -28,6 +28,7 @@
     "method": "Paytm/ PhonePe/ UPI/ GPay",
      "description": "Make payment with Paytm/ PhonePe/ UPI/ GPay. After payment, upload screenshot below. We will confirm and start your order instantly.",
     "name": "Muhammad Wasif",
-    "qrCode": "qrimage.jpg"
+    "qrCode": "scanner.jpg"
   }
 }
+
