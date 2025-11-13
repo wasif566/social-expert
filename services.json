@@ -2,9 +2,10 @@
   "PKR": {
     "instagram": { "followers": 850, "likes": 150, "views": 50, "comments": 1500 },
     "facebook": { "followers": 750, "postlikes": 300, "followerslikes": 900, "reactions": 350, "views": 150, "comments": 5500 },
-    "youtube": { "subscribers": 8500, "likes": 200, "views": 480, "comments": 2500 },
+    "youtube": { "subscribers": 8500, "likes": 250, "views": 480, "comments": 2500 },
     "tiktok": { "followers": 650, "likes": 150, "views": 70, "comments": 1500 }
   }
 }
+
 
 
