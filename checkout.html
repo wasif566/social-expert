@@ -436,152 +436,161 @@ font-size: 16px;
       container.appendChild(totalDiv);
     }
 
-    // ✅ Payment Section
-    async function populatePaymentSection() {
-      const paymentSection = document.getElementById('paymentSection');
-      try {
-        const response = await fetch('payments.json');
-        const payments = await response.json();
-
-        const payment = payments[checkoutData.baseCurrency];
-        if (!payment) {
-          paymentSection.innerHTML = "<p>No payment method available.</p>";
-          return;
-        }
-
-        let paymentHTML = '';
-        switch (checkoutData.baseCurrency) {
-          case 'USD':
-          case 'GBP':
-          case 'EUR':
-            paymentHTML = `
-             <div class="payment-method">
-                        <h4>💳 ${payment.method} Payment</h4>
-                        <p>${payment.description}</p>
-                    </div>
-                    
-                    <div class="acount-title">
-                        <label class="bold-text">Name:</label>
-                        <span class="bold-text">${payment.name}</span>
-                    </div>
-                    <div class="copyable-field">
-                        <label class="bold-text">Email:</label>
-                        <span class="Email">${payment.email}</span>
-                        <button class="copy-btn" onclick="copyToClipboard('${payment.email}', this)">Copy</button>
-                    </div>
-                `;
-            break;
-          case 'PKR':
-            paymentHTML = `
-             <div class="payment-method">
-                        <h4>💳 ${payment.method}</h4>
-                        <p>${payment.description}</p>
-                    </div>
-                    
-                    <div class="acount-title">
-                        <label class="bold-text">Name:</label>
-                        <span class="bold-text">${payment.name}</span>
-                    </div>
-                    <div class="copyable-field">
-                        <label class="bold-text">Number:</label>
-                        <span class="bold-text">${payment.number}</span>
-                        <button class="copy-btn" onclick="copyToClipboard('${payment.number}', this)">Copy</button>
-                    </div>
-                `;
-            break;
-          case 'INR':
-            paymentHTML = `
-                           <div class="payment-method">
-                        <h4>💳${payment.method}</h4>
-                        <p>${payment.description}</p>
-                       
-
-
-
-                        </div>
-                        <div style="margin: 1rem 0; padding: 0.2rem; font-size:20px; color: rgb(25, 101, 25); border-radius: 10px; text-align: center;">
-                            <p><strong>Scan and pay</strong></p>
-                            <div style="width: 250px; height: auto; margin: 0.3rem auto; border: 2px dashed #ccc ; border-radius: 10px;  display: flex; align-items: center; justify-content: center;">
-                                <img src="${payment.qrCode}" alt="UPI QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;">
-                            </div>
-                        </div>
-                    </div>
-                `;
-            break;
-        }
-
-        paymentSection.innerHTML = paymentHTML + `
-          <p class="payment-text">
-            If you want another payment method, contact on 
-            <a href="https://wa.me/923266438812?text=Hello%20I%20want%20to%20know%20about%20another%20payment%20method"
-              target="_blank"
-              class="whatsapp-btn">📱 WhatsApp</a>
-          </p>`;
-      } catch (err) {
-        paymentSection.innerHTML = "<p>Error loading payment methods.</p>";
-      }
-    }
-
-    // ✅ Copy to clipboard
-    function copyToClipboard(text, button) {
-      navigator.clipboard.writeText(text).then(() => {
-        button.textContent = 'Copied!';
-        setTimeout(() => button.textContent = 'Copy', 2000);
-      }).catch(() => alert("Failed to copy"));
-    }
-
-    // ✅ Confirm button → WhatsApp message
-    document.getElementById('confirmCheckout').addEventListener('click', () => {
-      if (typeof fbq === 'function' && checkoutData && checkoutData.cart) {
-  // Step 1: InitiateCheckout → user is submitting order
-  fbq('track', 'InitiateCheckout', {
-    currency: checkoutData.baseCurrency,
-    value: checkoutData.total,
-    num_items: checkoutData.cart.length
-  });
-
-  // Step 2: Purchase → same click = considered purchase
-  fbq('track', 'Purchase', {
-    currency: checkoutData.baseCurrency,
-    value: checkoutData.total
-  });
+    /* === Helper: map country code to payments.json key === */
+function countryCodeToPaymentKey(countryCode, displayCurrency, baseCurrency) {
+  if (!countryCode) {
+    // fallback chain: displayCurrency -> baseCurrency -> USD
+    return displayCurrency || baseCurrency || 'USD';
+  }
+  const c = countryCode.toUpperCase();
+  switch (c) {
+    case 'PK': return 'PKR';
+    case 'IN': return 'INR';
+    case 'EU': return 'EUR'; // if you set detectedCountry to 'EU' for EU-group
+    case 'GB':
+    case 'UK': return 'GBP';
+    case 'US': return 'USD';
+    default:
+      // If not in our explicit mapping, prefer displayCurrency if it exists, else baseCurrency, else USD
+      return displayCurrency || baseCurrency || 'USD';
+  }
 }
 
-      const comment = document.getElementById('additionalComment').value;
-      const screenshot = document.getElementById('paymentScreenshot').files[0];
+/* === Replacement populatePaymentSection(): chooses payment method by detected country ONLY and shows no markup info === */
+async function populatePaymentSection() {
+  const paymentSection = document.getElementById('paymentSection');
+  paymentSection.innerHTML = `<p>Loading available payment options...</p>`;
 
-      let cartDetails = "";
-      if (checkoutData.cart.length === 1) {
-        const item = checkoutData.cart[0];
-        cartDetails += `*Platform:* ${item.platform}\n`;
-        cartDetails += `*Service:* ${item.service}\n`;
-        cartDetails += `*Quantity:* ${item.quantity}\n`;
-        cartDetails += `*Link:* ${item.url}\n`;
-        cartDetails += `*Price:* ${formatCurrency(item.displayPrice, checkoutData.displayCurrency)}\n`;
-      } else {
-        checkoutData.cart.forEach((item, i) => {
-          cartDetails += `*Order #${i+1}*\n`;
-          cartDetails += `*Platform:* ${item.platform}\n`;
-          cartDetails += `*Service:* ${item.service}\n`;
-          cartDetails += `*Quantity:* ${item.quantity}\n`;
-          cartDetails += `*Link:* ${item.url}\n`;
-          cartDetails += `*Price:* ${formatCurrency(item.displayPrice, checkoutData.displayCurrency)}\n\n`;
-        });
+  try {
+    const resp = await fetch('payments.json?t=' + new Date().getTime());
+    if (!resp.ok) throw new Error('payments.json not found');
+    const payments = await resp.json();
+
+    // Use detectedCountry if available, otherwise fallback to displayCurrency or baseCurrency
+    const detectedCountry = (checkoutData && checkoutData.detectedCountry) ? checkoutData.detectedCountry : null;
+    const displayCurrency = (checkoutData && checkoutData.displayCurrency) ? checkoutData.displayCurrency : null;
+    const baseCurrency = (checkoutData && checkoutData.baseCurrency) ? checkoutData.baseCurrency : null;
+
+    const key = countryCodeToPaymentKey(detectedCountry, displayCurrency, baseCurrency);
+
+    // if payments.json doesn't have the selected key, try fallbacks: displayCurrency, baseCurrency, USD, PKR, INR
+    let paymentKey = key;
+    const fallbackOrder = [displayCurrency, baseCurrency, 'USD', 'PKR', 'INR', 'EUR', 'GBP'];
+    if (!payments[paymentKey]) {
+      for (const f of fallbackOrder) {
+        if (f && payments[f]) { paymentKey = f; break; }
       }
+    }
 
-      let message = `🛒 *Checkout Order*\n\n${cartDetails}`;
-      message += `*Total Amount:* ${formatCurrency(checkoutData.total, checkoutData.displayCurrency)}\n`;
-      message += `*Screenshot:* ${screenshot ? "Uploaded" : "Uploaded"}\n`;
-      message += `*Additional Comments:* ${comment || "N/A"}\n\n`;
-      message += `Note:\nI didn't receive your payment screenshot yet. Please send your payment screenshot again.\nOnce your payment is confirmed, your order will be processed instantly.\n\n✅ Thank you for choosing our services!`;
+    const payment = payments[paymentKey];
+    if (!payment) {
+      paymentSection.innerHTML = `<p>No payment method available. Please contact <a class="whatsapp-btn" href="https://wa.me/923266438812?text=Need%20payment%20method" target="_blank">WhatsApp</a></p>`;
+      return;
+    }
 
-      const whatsappURL = `https://wa.me/923266438812?text=${encodeURIComponent(message)}`;
-      window.open(whatsappURL, "_blank");
-    });
+    // Build payment HTML (only show method and provided fields — no markup / percentages)
+    let html = `
+      <div class="payment-method">
+        <h4>💳 ${payment.method || paymentKey} </h4>
+        <p>${payment.description || ''}</p>
+      </div>
+    `;
 
-    // Load payments
-    populatePaymentSection();
+    if (payment.email) {
+      html += `
+        <div class="acount-title">
+          <label class="bold-text">Name:</label>
+          <span class="bold-text">${payment.name || ''}</span>
+        </div>
+        <div class="copyable-field">
+          <label class="bold-text">Email:</label>
+          <span class="Email">${payment.email}</span>
+          <button class="copy-btn" onclick="copyToClipboard('${payment.email}', this)">Copy</button>
+        </div>
+      `;
+    } else if (payment.number) {
+      html += `
+        <div class="acount-title">
+          <label class="bold-text">Name:</label>
+          <span class="bold-text">${payment.name || ''}</span>
+        </div>
+        <div class="copyable-field">
+          <label class="bold-text">Number:</label>
+          <span class="bold-text">${payment.number}</span>
+          <button class="copy-btn" onclick="copyToClipboard('${payment.number}', this)">Copy</button>
+        </div>
+      `;
+    } else if (payment.qrCode) {
+            //  <label class="bold-text">Name:</label>
+          // <span class="bold-text">${payment.name || ''}</span> 
+          //  Agr name show krwana ha to is ka nich alikna ha <div class="acount-title">
+      html += `
+        <div class="acount-title">
+ 
+       
+        </div>
+        <div style="margin: 1rem 0; padding: 0.2rem; font-size:18px; color: rgb(25, 101, 25); border-radius: 10px; text-align: center;">
+          <p><strong>Scan and pay</strong></p>
+          <div style="width: 220px; margin: 0.3rem auto; border: 2px dashed #ccc; border-radius: 10px; display:flex;align-items:center;justify-content:center;">
+            <img src="${payment.qrCode}" alt="QR Code" style="width:100%;height:auto;border-radius:8px;">
+          </div>
+        </div>
+      `;
+    } else {
+      // If payment exists but doesn't include expected fields — show name and method
+      html += `
+        <div class="acount-title">
+          <label class="bold-text">Name:</label>
+          <span class="bold-text">${payment.name || '—'}</span>
+        </div>
+      `;
+    }
+
+    // Append contact WhatsApp as in your original UI
+    html += `<p class="payment-text">
+                If you want another payment method, contact on 
+                <a href="https://wa.me/923266438812?text=Hello%20I%20want%20to%20know%20about%20another%20payment%20method" target="_blank" class="whatsapp-btn">📱 WhatsApp</a>
+             </p>`;
+
+    paymentSection.innerHTML = html;
+  } catch (err) {
+    console.error(err);
+    paymentSection.innerHTML = "<p>Error loading payment methods.</p>";
+  }
+}
+
+// call to populate on page load (keep your existing load flow)
+populatePaymentSection();
+    // ✅ Format currency (NO decimals for PKR & INR)
+function formatCurrency(num, currency) {
+  // Remove cents for PKR & INR
+  if (currency === "PKR" || currency === "INR") {
+    const rounded = Math.round(num);
     
+    if (currency === "PKR") {
+      return "Rs " + new Intl.NumberFormat("en-PK", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(rounded);
+    }
+
+    if (currency === "INR") {
+      return "₹" + new Intl.NumberFormat("en-IN", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(rounded);
+    }
+  }
+
+  // For all other currencies → normal formatting
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(num);
+}
+
   </script>
 </body>
 </html>
