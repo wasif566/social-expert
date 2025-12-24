@@ -582,7 +582,7 @@ font-size: 16px;
 
       const payment = payments[paymentKey];
       if (!payment) {
-        paymentSection.innerHTML = `<p>No payment method available. Please contact <a class="whatsapp-btn" href="https://wa.me/923266438812?text=Need%20payment%20method" target="_blank">WhatsApp</a></p>`;
+        paymentSection.innerHTML = `<p>No payment method available. Please contact <a class="whatsapp-btn" href="https://wa.me/923217549190?text=Need%20payment%20method" target="_blank">WhatsApp</a></p>`;
         return;
       }
 
@@ -641,7 +641,7 @@ font-size: 16px;
 
       html += `<p class="payment-text">
                  If you want another payment method, contact on 
-                 <a href="https://wa.me/923266438812?text=Hello%20I%20want%20to%20know%20about%20another%20payment%20method" target="_blank" class="whatsapp-btn">📱 WhatsApp</a>
+                 <a href="https://wa.me/923217549190?text=Hello%20I%20want%20to%20know%20about%20another%20payment%20method" target="_blank" class="whatsapp-btn">📱 WhatsApp</a>
                </p>`;
 
       paymentSection.innerHTML = html;
@@ -785,7 +785,7 @@ font-size: 16px;
         message += `*Additional Comments:* ${comment || "N/A"}\n\n`;
         message += `Note:\nI didn't receive your payment screenshot yet. Please send your payment screenshot again.\nOnce your payment is confirmed, your order will be processed instantly.\n\n✅ Thank you for choosing our services!`;
 
-        const whatsappURL = `https://wa.me/923266438812?text=${encodeURIComponent(message)}`;
+        const whatsappURL = `https://wa.me/923217549190?text=${encodeURIComponent(message)}`;
         window.open(whatsappURL, "_blank");
       } catch (err) {
         console.error('Error preparing WhatsApp message', err);
@@ -820,3 +820,4 @@ font-size: 16px;
 
 </body>
 </html>
+
